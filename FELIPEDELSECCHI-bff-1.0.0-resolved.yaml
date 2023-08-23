@@ -1,0 +1,66 @@
+---
+openapi: 3.0.0
+info:
+  title: Traders Club
+  description: This is a simple API
+  contact:
+    email: luis.serrano@tc.com.br
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/FELIPEDELSECCHI/bff/1.0.0
+  description: SwaggerHub API Auto Mocking
+paths:
+  /bff:
+    get:
+      tags:
+      - developers
+      summary: listar usuario
+      parameters:
+      - name: token
+        in: query
+        description: enviar token de usuario
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: autorizacao
+        in: header
+        description: INforme authorization
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+        "400":
+          description: bad input parameter
+components:
+  schemas:
+    InventoryItem:
+      required:
+      - id
+      - manufacturer
+      - name
+      - releaseDate
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        name:
+          type: string
+          example: Widget Adapter
+        releaseDate:
+          type: string
+          format: date-time
+          example: 2016-08-29T09:12:33.001Z

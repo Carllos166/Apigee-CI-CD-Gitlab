@@ -1,0 +1,15 @@
+swagger: '2.0'
+info:
+  title: Minha API
+  version: 1.0.0
+basePath: /v1
+
+paths:
+  /hello:
+    get:
+      description: Retorna uma mensagem de saudação
+      responses:
+        200:
+          description: OK
+          schema:
+            type: string

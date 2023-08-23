@@ -1,0 +1,88 @@
+image: google/cloud-sdk:427.0.0-slim
+
+before_script: 
+    - |
+      # Main branch for Apigee test environment
+      if [[ $CI_COMMIT_BRANCH == "main" ]]; then
+            export DEFAULT_APIGEE_ORG=shared-dev-tech
+            export DEFAULT_APIGEE_ENV=development
+            export DEFAULT_OPEN_API_SPEC=swagger-webhook-bvs.json
+            export TEST_HOST=bvsnet.com.br
+            export API_VERSION=googleapi
+        
+        # Prod branch for Apigee prod environment
+        else
+        
+          if [[ $CI_COMMIT_BRANCH == "prod-apigee" ]]; then
+            export DEFAULT_APIGEE_ORG=shared-dev-tech
+            export DEFAULT_APIGEE_ENV=development
+            export DEFAULT_OPEN_API_SPEC=swagger-webhook-bvs.json
+            export TEST_HOST=bvsnet.com.br   
+            export API_VERSION=googleapi   
+          fi
+        fi
+
+#variables:
+  
+
+# or 
+#API_VERSION: "apigeeapi"
+# GCP_SERVICE_ACCCOUNT, APIGEE_CREDS_USR & APIGEE_CREDS_PSW are stored in GitLab CI/CD variable settings  
+## - export TOKEN=$(gcloud auth print-access-token)  
+
+stages: 
+  - pre
+  - build_deploy
+
+prepare:
+  stage: pre
+  tags:
+    - cloud-foundations
+  script:
+    - gcloud auth list
+    - export GCP_TOKEN=$(gcloud auth print-access-token)
+    - echo "GCP_TOKEN=$GCP_TOKEN" >> apigee.env
+    - echo "$DEFAULT_APIGEE_ORG"
+  artifacts:
+    reports:
+      dotenv: apigee.env
+
+    
+build & deploy:
+  stage: build_deploy
+  tags:
+    - cloud-foundations   
+  before_script:    
+    - |
+      # Main branch for Apigee test environment
+      if [[ $CI_COMMIT_BRANCH == "main" ]]; then
+            export DEFAULT_APIGEE_ORG=shared-dev-tech
+            export DEFAULT_APIGEE_ENV=development
+            export DEFAULT_OPEN_API_SPEC=swagger-webhook-bvs.json
+            export TEST_HOST=bvsnet.com.br
+            export API_VERSION=googleapi
+        
+        # Prod branch for Apigee prod environment
+        else
+        
+          if [[ $CI_COMMIT_BRANCH == "prod-apigee" ]]; then
+            export DEFAULT_APIGEE_ORG=shared-dev-tech
+            export DEFAULT_APIGEE_ENV=development
+            export DEFAULT_OPEN_API_SPEC=swagger-webhook-bvs.json
+            export TEST_HOST=bvsnet.com.br   
+            export API_VERSION=googleapi   
+          fi
+        fi         
+    - 'apt -y install zip unzip'
+    - 'apt -y install jq'
+    - 'curl -L https://raw.githubusercontent.com/apigee/apigeecli/main/downloadLatest.sh | sh -'
+    - export PATH=$PATH:$HOME/.apigeecli/bin
+  script:    
+    # - apigeecli token cache -t $GCP_TOKEN --no-output
+    - apigeecli prefs set -o "$DEFAULT_APIGEE_ORG" -t "$GCP_TOKEN"
+    - export API_NAME=$(cat $DEFAULT_OPEN_API_SPEC | jq -r '.info.title')    
+    - echo "$API_NAME" 
+    - echo "$DEFAULT_OPEN_API_SPEC"
+    - echo "$DEFAULT_APIGEE_ORG"
+    - apigeecli apis create oas -f "$DEFAULT_OPEN_API_SPEC" -o "$DEFAULT_APIGEE_ORG" -n "$API_NAME" -t "$GCP_TOKEN" --bundle --directory /caminho/para/o/diretorio
+    - apigeecli apis deploy -n "$API_NAME" -r 1 -o "$DEFAULT_APIGEE_ORG" -e "$DEFAULT_APIGEE_ENV"

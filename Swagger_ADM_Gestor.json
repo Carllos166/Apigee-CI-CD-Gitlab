@@ -1,0 +1,68 @@
+{
+   "swagger": "2.0",
+   "info": {
+      "description": "Mapeamento dos Endpoints do projeto",
+      "version": "v1",
+      "title": "ADM GESTOR"
+   },
+   "host": "gateway.cruzeirodosul.edu.br",
+   "basePath": "/adm-gestor",
+   "paths": {
+      "/banco": {
+         "get": {
+            "tags": [
+               "Banco"
+            ],
+            "summary": "findAll",
+            "description": "Find Banco",
+            "operationId": "findAllUsingGET_1",
+            "produces": [
+               "application/json;charset=UTF-8"
+            ],
+            "responses": {
+               "200": {
+                  "description": "OK",
+                  "schema": {
+                     "type": "array",
+                     "items": {
+                        "$ref": "#/definitions/BancoResponse"
+                     }
+                  }
+               }
+            }
+         }
+      }
+   },
+   "definitions": {
+      "BancoResponse": {
+         "type": "object",
+         "properties": {
+            "atvFies": {
+               "type": "integer",
+               "format": "int32"
+            },
+            "codigoBanco": {
+               "type": "integer",
+               "format": "int32"
+            },
+            "codigoOficial": {
+               "type": "string"
+            },
+            "descricao": {
+               "type": "string"
+            },
+            "idBanco": {
+               "type": "integer",
+               "format": "int64"
+            },
+            "nomePro": {
+               "type": "string"
+            },
+            "sigla": {
+               "type": "string"
+            }
+         },
+         "title": "BancoResponse"
+      }
+   }
+}
